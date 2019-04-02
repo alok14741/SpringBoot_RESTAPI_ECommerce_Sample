@@ -1,5 +1,7 @@
 package com.ecommerce.api.controller;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.api.entity.Item;
 import com.ecommerce.api.entity.Response;
-import com.ecommerce.api.exceptions.ItemNotFoundException;
+import com.ecommerce.api.exceptions.RecordNotFoundException;
 import com.ecommerce.api.repository.ItemRepository;
 
 import javassist.tools.web.BadHttpRequest;
@@ -26,20 +28,28 @@ public class ItemController {
 
 	@GetMapping
 	public Iterable<Item> findAll() {
-		return itemRepository.findAll();
+		Iterable<Item> items = itemRepository.findAll();
+		int counter = 0;
+		for (@SuppressWarnings("unused") Object i : items) {
+			counter++;
+		}
+		if (counter == 0) {
+			throw new RecordNotFoundException("No Items Exists in DB");
+		}
+		return items;
 	}
 
 	@GetMapping(path = "{itemID}")
 	public Item find(@PathVariable("itemID") String itemID) {
 		Item item = itemRepository.findOne(itemID);
 		if (item == null) {
-			throw new ItemNotFoundException("Item Code-" + itemID);
+			throw new RecordNotFoundException("Item Code-" + itemID);
 		}
 		return item;
 	}
 
 	@PostMapping(consumes = "application/json")
-	public Response create(@RequestBody Item item) {
+	public Response create(@Valid @RequestBody Item item) {
 		Item insert = itemRepository.save(item);
 		Response response = new Response();
 		if (insert != null) {

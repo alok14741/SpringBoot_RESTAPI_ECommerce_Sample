@@ -3,21 +3,28 @@ package com.ecommerce.api.entity;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotEmpty;
 
 @Entity
 public class Orders {
 
 	@Id
+	@NotEmpty(message = "Order Code is required.")
 	@Basic(optional = false)
 	private String orderCode;
-	@NotNull(message = "Item Code is required.")
+	@NotEmpty(message = "Item Code is required.")
 	@Basic(optional = false)
 	private String itemCode;
 	@NotNull(message = "Number of Items is required.")
 	@Basic(optional = false)
+	@Min(1)
 	private int numberOfItems;
-	@NotNull(message = "Email is Mandatory")
+	@NotEmpty(message = "Email is Mandatory")
+	@Email(message = "email should be a valid email")
 	private String email;
 
 	public String getOrderCode() {
